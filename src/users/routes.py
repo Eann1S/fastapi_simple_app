@@ -11,7 +11,7 @@ from .models import User
 router = APIRouter()
 
 
-@router.post("/users/create", response_model=UserPublic)
+@router.post("/users", response_model=UserPublic)
 def create_user(*, userCreate: UserCreate = Depends(is_user_email_valid), session: SessionDep):
     update_data = {"hashed_password": userCreate.password}
     user = User.model_validate(userCreate, update=update_data)
