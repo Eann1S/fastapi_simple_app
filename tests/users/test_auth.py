@@ -3,7 +3,6 @@ from src.main import app
 from src.database import get_session
 from sqlmodel import Session, SQLModel, create_engine
 from sqlmodel.pool import StaticPool
-from src.users.models import User
 import pytest
 
 
@@ -23,24 +22,31 @@ def client_fixture(session: Session):
     app.dependency_overrides.clear()
 
 
-def test_create_user(client: TestClient):
-    response = client.post("/users", json={"email": "test@wp.pl", "password": "test123"})
+def test_register(client: TestClient):
+    response = client.post("/register", json={"email": "test1@wp.pl", "password": "test123"})
     data = response.json()
-    
+
     assert response.status_code == 200
-    assert data["email"] == "test@wp.pl"
+    assert data["email"] == "test1@wp.pl"
     assert data["id"] is not None
 
 
-def test_get_user(session: Session, client: TestClient):
-    user = User(email="test@wp.pl", hashed_password="test123")
-    session.add(user)
-    session.commit()
-    session.refresh(user)
+def test_login(client: TestClient):
+    register_user(json={"email": "test2@wp.pl", "password": "test123"}, client=client)
 
-    response = client.get(f"/users/{user.id}")
+    response = client.post(
+        "/token",
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+        data={"username": "test2@wp.pl", "password": "test123"},
+    )
     data = response.json()
-    
+
     assert response.status_code == 200
-    assert data["email"] == "test@wp.pl"
-    assert data["id"] == user.id
+    assert data["access_token"] is not None
+    assert data["token_type"] == "bearer"
+
+
+def register_user(json: dict[str, str], client: TestClient):
+    response = client.post("/register", json=json)
+    data = response.json()
+    return data

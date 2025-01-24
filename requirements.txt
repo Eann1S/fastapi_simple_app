@@ -7,3 +7,4 @@ flake8
 pyjwt
 passlib[bcrypt]
 mypy
+python-multipart
