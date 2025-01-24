@@ -1,26 +1,16 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends
 
-from .dependencies import is_user_email_valid, is_user_id_valid
+from ..auth.dependencies import get_current_user
 
-from .schemas import UserCreate, UserPublic
-from ..database import SessionDep
+from .schemas import UserPublic
+
 from .models import User
 
 
-router = APIRouter()
+router = APIRouter(prefix="/users")
 
 
-@router.post("/users", response_model=UserPublic)
-def create_user(*, userCreate: UserCreate = Depends(is_user_email_valid), session: SessionDep):
-    update_data = {"hashed_password": userCreate.password}
-    user = User.model_validate(userCreate, update=update_data)
-    session.add(user)
-    session.commit()
-    session.refresh(user)
-    return user
-
-
-@router.get("/users/{user_id}", response_model=UserPublic)
-def get_user(*, user_id: int, user: User = Depends(is_user_id_valid)):
+@router.get("/me", response_model=UserPublic)
+def get_current_user(*, user: Annotated[User, Depends(get_current_user)]):
     return user

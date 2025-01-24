@@ -9,3 +9,4 @@ dist/
 .serverless/
 .idea/
 .vscode/
+.pytest_cache

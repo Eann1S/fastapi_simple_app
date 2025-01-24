@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from .users.routes import router as users
+from .auth.routes import router as auth
 from .database import create_db_and_tables
 
 
@@ -13,3 +14,4 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 app.include_router(router=users)
+app.include_router(router=auth)

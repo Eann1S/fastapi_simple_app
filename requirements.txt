@@ -3,3 +3,7 @@ sqlmodel
 psycopg2
 requests
 pytest
+flake8
+pyjwt
+passlib[bcrypt]
+mypy
